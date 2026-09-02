@@ -27,6 +27,10 @@ becomes visible after building a per-account distribution and comparing it
 against a population baseline. So perfecting item 4 is wasted effort if you are
 doing item 1.
 
+The table ranks behaviours. It deliberately leaves out
+[account identity](#account-identity-which-is-not-a-behaviour), which is not one
+and which can be cheaper to check than anything on it.
+
 ### Selection and conviction are different problems
 
 The distinction that matters is which stage of that pipeline a behaviour belongs
@@ -56,7 +60,7 @@ the one paying for it, and above Gold it is not
 ([below](#conviction-is-not-only-the-operators-to-pay-for)). A second premise
 fails outright against an account whose device is already on a list, since both
 stages were paid for on a previous account
-([above](#after-a-ban-the-profile-is-the-liability)).
+([also below](#after-a-ban-the-profile-is-the-liability)).
 
 ### How much to trust any of this
 
@@ -115,80 +119,6 @@ as much as the count.
 **The same total spread differently is a different signal.** Six hundred games
 accumulated over a year at one or two a day reads as an ordinary player. The same
 six hundred inside two months at ten hanchan a day does not.
-
-### The device ID links accounts to each other
-
-Every login carries an explicit hardware block, so account linkage is not
-something an operator has to infer — the client volunteers a join key:
-
-```json
-"device": { "device_id": "<profile uuid>", "os": "mac", "software": "Chrome", ... },
-"random_key": "<profile uuid>"
-```
-
-`device_id` is a stable UUID kept in the browser profile's local storage and
-resent on every login. Two rules follow from where it is stored:
-
-- **Same profile, same region → same `device_id`.** Every account played through
-  one profile reports one UUID, so they group with a single query.
-- **Different region → different `device_id`.** Local storage is scoped per
-  origin, so the JP and EN clients each mint and keep their own UUID even inside
-  the same profile. Playing both does not link them.
-
-Any tool that reuses one browser profile directory so logins survive restarts —
-which is nearly all of them — therefore links every account played through it in
-a given region. The reports agree that **a confirmed tool user loses every
-linked account**, which makes linked accounts one unit rather than independent
-trials.
-
-To keep accounts separate, give each its own persistent profile directory, or
-play one account per region. Two caveats: a shared egress IP links them
-regardless, and randomising the ID per session is *worse* than sharing it,
-because a stable account whose hardware appears to change daily is a louder
-signal than the grouping it would have replaced.
-
-### After a ban, the profile is the liability
-
-The linkage above is simultaneous: accounts played through one profile group
-together, and a confirmation on one takes the rest. The same key also works
-forwards in time, and that case is worse.
-
-A `device_id` attached to a confirmed ban is no longer a heuristic. It is a
-labelled positive, and checking it costs one indexed comparison at login. Every
-other item in this chapter needs accumulated behaviour before it says anything —
-volume needs days, a timing histogram needs hundreds of discards, agreement
-needs replays. A blacklisted device matches **before the first hand is played**.
-
-That inverts the pipeline the ordering is built around. Selection and conviction
-both already happened, on the previous account; what is left is a lookup. A new
-account created after a ban and played through the surviving profile therefore
-starts flagged, and patient, low-volume growth — which helps against everything
-else here — buys nothing, because the flag precedes the behaviour it would
-otherwise have to earn.
-
-Whether an operator acts on such a match automatically is a separate question,
-and inference. `device_id` is client-supplied local storage: clearable,
-forgeable, and shared by everyone on one machine, so treating it as proof would
-misfire on shared and family machines. Lowering a threshold for the accounts it
-groups, or holding the group and sweeping it when one member is confirmed, costs
-nothing and survives those objections.
-
-The remedy is cheap and easy to miss. **After a ban, discard the browser
-profile, not only the account.** A new profile directory mints a new UUID on
-first login; creating a fresh account inside the old one is the single move that
-guarantees the link.
-
-### Account age
-
-Not something the reports quantify, but it costs nothing to reason about. A
-freshly created account that immediately produces daily heavy volume and a fast
-rank climb is the cheapest possible query — age, games and rank delta are three
-columns in the same table. An account with years of ordinary history behind it
-has to be pulled out by something else first.
-
-Judge age from the oldest badge timestamp in the login response rather than from
-the account ID: IDs are not issued in creation order, and a numerically high one
-can be years old.
 
 ## 3. Rating and agreement with an AI
 
@@ -290,13 +220,96 @@ checked against the retry rate rather than only against the histogram.
 Players in the higher rooms report recognising suspected bot accounts at a rate
 of roughly one per four games, from things like unusually slow North
 declarations, long pauses before passing on a call, and late riichi. That
-perception is what starts a report, and above Gold it can be followed up with
-the replays themselves ([below](#conviction-is-not-only-the-operators-to-pay-for)).
+perception is what starts a report. Above Gold it can then be followed up with
+the replays themselves, and what happens to it after that is not encouraging
+reading in either direction
+([who pays for conviction](#conviction-is-not-only-the-operators-to-pay-for)).
 
-Whether reports lead anywhere is genuinely unclear — there are accounts of
-reporting obvious collusion and seeing no action. But the view that a confirmed
-tool user loses every linked account is also out there, which is reason enough
-not to dismiss it.
+## Account identity, which is not a behaviour
+
+The four items above are things you do, and each can be stopped by doing
+something else. What follows cannot. Identity is a property of the account and
+the machine, it is attached before play begins, and no amount of careful play
+detaches it.
+
+That also puts it outside the cost ordering rather than somewhere within it. A
+lookup against a known device is cheaper than the cheapest behavioural query on
+the list, because it needs no aggregation and no time window — which is what
+makes the post-ban case below the sharpest item in this chapter.
+
+### The device ID links accounts to each other
+
+Every login carries an explicit hardware block, so account linkage is not
+something an operator has to infer — the client volunteers a join key:
+
+```json
+"device": { "device_id": "<profile uuid>", "os": "mac", "software": "Chrome", ... },
+"random_key": "<profile uuid>"
+```
+
+`device_id` is a stable UUID kept in the browser profile's local storage and
+resent on every login. Two rules follow from where it is stored:
+
+- **Same profile, same region → same `device_id`.** Every account played through
+  one profile reports one UUID, so they group with a single query.
+- **Different region → different `device_id`.** Local storage is scoped per
+  origin, so the JP and EN clients each mint and keep their own UUID even inside
+  the same profile. Playing both does not link them.
+
+Any tool that reuses one browser profile directory so logins survive restarts —
+which is nearly all of them — therefore links every account played through it in
+a given region. The reports agree that **a confirmed tool user loses every
+linked account**, which makes linked accounts one unit rather than independent
+trials.
+
+To keep accounts separate, give each its own persistent profile directory, or
+play one account per region. Two caveats: a shared egress IP links them
+regardless, and randomising the ID per session is *worse* than sharing it,
+because a stable account whose hardware appears to change daily is a louder
+signal than the grouping it would have replaced.
+
+### After a ban, the profile is the liability
+
+The linkage above is simultaneous: accounts played through one profile group
+together, and a confirmation on one takes the rest. The same key also works
+forwards in time, and that case is worse.
+
+A `device_id` attached to a confirmed ban is no longer a heuristic. It is a
+labelled positive, and checking it costs one indexed comparison at login. Every
+other item in this chapter needs accumulated behaviour before it says anything —
+volume needs days, a timing histogram needs hundreds of discards, agreement
+needs replays. A blacklisted device matches **before the first hand is played**.
+
+That inverts the pipeline the ordering is built around. Selection and conviction
+both already happened, on the previous account; what is left is a lookup. A new
+account created after a ban and played through the surviving profile therefore
+starts flagged, and patient, low-volume growth — which helps against everything
+else here — buys nothing, because the flag precedes the behaviour it would
+otherwise have to earn.
+
+Whether an operator acts on such a match automatically is a separate question,
+and inference. `device_id` is client-supplied local storage: clearable,
+forgeable, and shared by everyone on one machine, so treating it as proof would
+misfire on shared and family machines. Lowering a threshold for the accounts it
+groups, or holding the group and sweeping it when one member is confirmed, costs
+nothing and survives those objections.
+
+The remedy is cheap and easy to miss. **After a ban, discard the browser
+profile, not only the account.** A new profile directory mints a new UUID on
+first login; creating a fresh account inside the old one is the single move that
+guarantees the link.
+
+### Account age
+
+Not something the reports quantify, but it costs nothing to reason about. A
+freshly created account that immediately produces daily heavy volume and a fast
+rank climb is the cheapest possible query — age, games and rank delta are three
+columns in the same table. An account with years of ordinary history behind it
+has to be pulled out by something else first.
+
+Judge age from the oldest badge timestamp in the login response rather than from
+the account ID: IDs are not issued in creation order, and a numerically high one
+can be years old.
 
 ## Conviction is not only the operator's to pay for
 
