@@ -1,0 +1,14 @@
+# Fitted output. These are your numbers, from your tables — the whole point is
+# that they are not shared. Keep them out of the repo by default.
+*-delay.lua
+my-delay.lua
+
+# Logs are raw captures and carry account ids, device ids and session tokens.
+# Never commit them.
+*.log
+logs/
+data/
+
+__pycache__/
+*.py[cod]
+.DS_Store
