@@ -51,6 +51,13 @@ the model's moves. Fitting a timing model lowers the chance of being *selected*
 by a timing query, and does nothing at all once you have been selected by any
 other route.
 
+One premise here is contested. Conviction is only scarce while the operator is
+the one paying for it, and above Gold it is not
+([below](#conviction-is-not-only-the-operators-to-pay-for)). A second premise
+fails outright against an account whose device is already on a list, since both
+stages were paid for on a previous account
+([above](#after-a-ban-the-profile-is-the-liability)).
+
 ### How much to trust any of this
 
 The ban reports are self-selected anecdotes from a Discord, with no denominators
@@ -139,6 +146,37 @@ play one account per region. Two caveats: a shared egress IP links them
 regardless, and randomising the ID per session is *worse* than sharing it,
 because a stable account whose hardware appears to change daily is a louder
 signal than the grouping it would have replaced.
+
+### After a ban, the profile is the liability
+
+The linkage above is simultaneous: accounts played through one profile group
+together, and a confirmation on one takes the rest. The same key also works
+forwards in time, and that case is worse.
+
+A `device_id` attached to a confirmed ban is no longer a heuristic. It is a
+labelled positive, and checking it costs one indexed comparison at login. Every
+other item in this chapter needs accumulated behaviour before it says anything —
+volume needs days, a timing histogram needs hundreds of discards, agreement
+needs replays. A blacklisted device matches **before the first hand is played**.
+
+That inverts the pipeline the ordering is built around. Selection and conviction
+both already happened, on the previous account; what is left is a lookup. A new
+account created after a ban and played through the surviving profile therefore
+starts flagged, and patient, low-volume growth — which helps against everything
+else here — buys nothing, because the flag precedes the behaviour it would
+otherwise have to earn.
+
+Whether an operator acts on such a match automatically is a separate question,
+and inference. `device_id` is client-supplied local storage: clearable,
+forgeable, and shared by everyone on one machine, so treating it as proof would
+misfire on shared and family machines. Lowering a threshold for the accounts it
+groups, or holding the group and sweeping it when one member is confirmed, costs
+nothing and survives those objections.
+
+The remedy is cheap and easy to miss. **After a ban, discard the browser
+profile, not only the account.** A new profile directory mints a new UUID on
+first login; creating a fresh account inside the old one is the single move that
+guarantees the link.
 
 ### Account age
 
@@ -252,12 +290,45 @@ checked against the retry rate rather than only against the histogram.
 Players in the higher rooms report recognising suspected bot accounts at a rate
 of roughly one per four games, from things like unusually slow North
 declarations, long pauses before passing on a call, and late riichi. That
-perception is what starts a report.
+perception is what starts a report, and above Gold it can be followed up with
+the replays themselves ([below](#conviction-is-not-only-the-operators-to-pay-for)).
 
 Whether reports lead anywhere is genuinely unclear — there are accounts of
 reporting obvious collusion and seeing no action. But the view that a confirmed
 tool user loses every linked account is also out there, which is reason enough
 not to dismiss it.
+
+## Conviction is not only the operator's to pay for
+
+The ordering in this chapter rests on replay analysis being expensive, and
+therefore rare enough that selection is the stage worth optimising against.
+Third-party replay hosting weakens that assumption, and it is the one part of
+the cost argument with a live counterexample.
+
+Replays from Gold upward are uploaded to a public archive that publishes volume
+rankings alongside its other statistics. Players who suspect an account report
+batch-analysing its replays — think time, rating, agreement with a model — and
+submitting the result to the operator as a written case.
+
+Three consequences follow, none of them measured here:
+
+- **Volume is publicly visible**, not merely inferable from data the operator
+  holds. Appearing repeatedly in a heavy-play ranking is a selection event that
+  occurs outside the operator entirely, and outside any schedule.
+- **The expensive stage gets donated.** Volunteers absorb the compute that the
+  cost argument assumed would keep conviction scarce, and they have no
+  obligation to size their effort to a population.
+- **A report can arrive pre-substantiated.** An operator handed a written case
+  with agreement figures attached is not being asked to run the pipeline, only
+  to check someone else's.
+
+This is reported to be common in the Chinese community. What remains unclear is
+the conversion rate, since well-documented collusion reports have also produced
+nothing. Treat it as a route that exists rather than one with a known yield.
+
+The practical reading is that the rooms above Gold cost more than their rank
+suggests. The same behaviour becomes legible to a second set of eyes, working
+without a budget and with considerably more patience than any nightly job.
 
 ## Tells that have nothing to do with timing
 
