@@ -29,11 +29,11 @@ are the Jade-room opponents from
    in both directions.
 3. **Its think time is a step function of the tile thrown**, with hard edges the
    server can recover by grouping on a column it already stores.
-4. **A related mistake was in our own config**, and finding it here is what
-   prompted looking: our dealer's opening discard was arriving in a single
-   whole-second bucket 62% of the time. Diagnosed and fixed in
+4. **The same fault class appears in fitted models**, not just uniform ones: a
+   dealer's opening discard arriving in a single whole-second bucket 62% of the
+   time. Diagnosed in
    [03-fitting-a-delay-model.md](03-fitting-a-delay-model.md#the-dealers-opening-discard);
-   summarised [below](#what-this-found-in-ours).
+   summarised [below](#the-same-fault-in-a-fitted-model).
 
 ## What its model does
 
@@ -195,14 +195,14 @@ stop-timer was added as a feature, which implies long unattended runs. Emoji
 replies are uniform over all nine, fire only in response to someone else's, and
 never spontaneously.
 
-## What this found in ours
+## The same fault in a fitted model
 
-Copilot adds a constant 4.5 seconds to the dealer's opening discard. Looking for
-its version of that mistake is what prompted checking our own
-`dealer_first_discard_extra_delay_ms`, and ours turned out worse: openings
-arriving in a single whole second 62% of the time against a human 15%, from two
-faults stacking — a model producing a 3.0 s median where humans take 5.57, and a
-budget cap close enough to that median to flatten it.
+Copilot adds a constant 4.5 seconds to the dealer's opening discard. A fitted
+model reaches a worse version of the same result through
+`dealer_first_discard_extra_delay_ms`: openings arriving in a single whole
+second 62% of the time against a human 15%, from two faults stacking — a model
+producing a 3.0 s median where humans take 5.57, and a budget cap close enough
+to that median to flatten it.
 
 The diagnosis and the corrected model are in
 [03-fitting-a-delay-model.md](03-fitting-a-delay-model.md#the-dealers-opening-discard);

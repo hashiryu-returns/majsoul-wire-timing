@@ -336,6 +336,7 @@ def main() -> int:
         "--template",
         type=Path,
         default=Path(__file__).with_name("delay-template.lua"),
+        help="Lua profile to fill in (default: delay-template.lua beside this script)",
     )
     args = ap.parse_args()
 

@@ -94,15 +94,11 @@ The four-player ranked `mode_id` values are 2/3 Bronze, 5/6 Silver, 8/9 Gold,
 
 `mode_id` 8 and 9 (Gold) and 15 and 16 (Throne) appear zero times.
 
-An earlier version of this analysis had these labels wrong, reading 5 and 6 as
-Gold and 12 as Throne, and concluded from that mistake that Silver and Jade were
-the unmeasurable rooms. Two things fix the mapping independently: the published
-`mode_id` list, and the rank gates. Gold admits only Expert and Master, and
-`mode_id` 5 seated 96 Adepts; Throne admits only Saint and Celestial, and
-`mode_id` 12 seated 14 Masters. **None of the measurements changed — every
-number was computed correctly and simply carried the wrong room name.** It is
-worth stating because a mislabelled room is an easy mistake to repeat, and it
-inverted a conclusion.
+Two things fix the mapping independently: the published `mode_id` list, and the
+rank gates. Gold admits only Expert and Master, and `mode_id` 5 seated 96
+Adepts; Throne admits only Saint and Celestial, and `mode_id` 12 seated 14
+Masters. Check both before naming a room — a wrong label inverts which rooms
+count as measured without changing a single number.
 
 ## Excluding artefacts
 
@@ -381,8 +377,7 @@ produced lost turns.
 ## The floor and the zero-second bucket
 
 The `<1s` figures above are the delay model's output. **They are not what the
-server sees**, and conflating the two produced a wrong conclusion that stood for
-a while before it was checked.
+server sees.**
 
 A well-built autoplayer subtracts the click execution overhead from its sleep so
 the click lands on target. For any target above the enforced minimum, that

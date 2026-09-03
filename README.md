@@ -32,8 +32,7 @@ captured opponents rather than shipping constants for everyone to share.
   sub-second rate from 10.0% to 20.3%.
 - **The client's clock and the proxy's differ by 390 ± 290 ms.** Comparing your
   reported `timeuse` against opponents' wall-clock intervals manufactures a
-  deficit that does not exist. This one produced a wrong conclusion before it
-  was caught.
+  deficit that does not exist.
 - **A uniform random delay is trivially identifiable.** A widely used tool
   builds its delay as "random 1-2 s plus a constant", which yields no discards
   under a second where humans produce about 10%, and almost none in the 4-6 s
